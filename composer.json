@@ -1,0 +1,62 @@
+{
+    "name": "caremillc/caremi",
+    "description": "Careminate framework development application.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "~8.4.0 || ~8.5.0",
+        "caremillc/framework": "dev-main"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpunit/phpunit": "^12.5"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "framework",
+            "canonical": true,
+            "options": {
+                "versions": {
+                    "caremillc/framework": "dev-main"
+                },
+                "reference": "config"
+            }
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CareminateIntegration\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "validate:packages": [
+            "@composer validate --strict",
+            "@composer --working-dir=framework validate --strict"
+        ],
+        "test": "@php vendor/bin/phpunit --configuration=phpunit.xml",
+        "analyse": "@php vendor/bin/phpstan analyse --configuration=phpstan.neon --no-progress",
+        "cs:check": "@php vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff --using-cache=no",
+        "cs:fix": "@php vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+        "check": [
+            "@validate:packages",
+            "@test",
+            "@analyse",
+            "@cs:check"
+        ]
+    },
+    "config": {
+        "allow-plugins": false,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

@@ -1,0 +1,81 @@
+name: Careminate CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  quality:
+    name: PHP ${{ matrix.php }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-24.04
+          - windows-2022
+        php:
+          - "8.4"
+          - "8.5"
+
+    env:
+      COMPOSER_NO_INTERACTION: "1"
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Require a committed dependency lock
+        run: |
+          if (-not (Test-Path -LiteralPath "composer.lock" -PathType Leaf)) {
+            throw "Generate and commit composer.lock before running CI."
+          }
+
+          git ls-files --error-unmatch -- composer.lock
+
+      - name: Set up PHP and Composer
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ctype, dom, fileinfo, iconv, mbstring, tokenizer, xml, xmlwriter
+          coverage: none
+          tools: composer:v2
+
+      - name: Report PHP version
+        run: php --version
+
+      - name: Report Composer version
+        run: composer --version
+
+      - name: Validate package manifests
+        run: composer validate:packages
+
+      - name: Install locked dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Check actual platform requirements
+        run: composer check-platform-reqs
+
+      - name: Run all quality checks
+        run: composer check
+
+      - name: Verify dependency metadata remained unchanged
+        run: git diff --exit-code -- composer.json composer.lock framework/composer.json

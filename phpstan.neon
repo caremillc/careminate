@@ -1,0 +1,14 @@
+includes:
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
+
+parameters:
+    level: max
+    phpVersion: 80400
+    tmpDir: .phpstan-cache
+
+    paths:
+        - framework/src
+        - framework/tests
+        - tests
+        - .php-cs-fixer.dist.php

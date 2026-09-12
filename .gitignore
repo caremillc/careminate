@@ -1,0 +1,27 @@
+# Installed dependencies.
+/vendor/
+/framework/vendor/
+
+# Local environment files and Composer credentials.
+.env
+.env.*
+!.env.example
+!.env.*.example
+auth.json
+
+# Generated quality-tool output.
+/build/
+/.phpunit.cache/
+/.phpstan-cache/
+/.php-cs-fixer.cache
+/framework/build/
+/framework/.phpunit.cache/
+/framework/.phpstan-cache/
+/framework/.php-cs-fixer.cache
+
+# Local editor and operating-system files.
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
